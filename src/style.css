@@ -1,0 +1,95 @@
+:root{
+  --bg:#fffaf3; --paper:#ffffff; --ink:#2b2a33; --muted:#6b6875;
+  --accent:#ff6b5a; --accent-dark:#e04e3d; --sun:#ffc94a; --mint:#5cc8a8; --sky:#6aa8ff;
+  --line:#efe6da; --radius:16px;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 "Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+a{color:var(--accent-dark)}
+img{max-width:100%;height:auto;display:block}
+h1{font-size:clamp(26px,4vw,36px);line-height:1.2;margin:.4em 0 .5em}
+h2{font-size:24px;margin:1.6em 0 .7em}
+.wrap{max-width:1180px;margin:0 auto;padding:0 16px}
+
+/* шапка */
+.top{background:var(--paper);border-bottom:3px solid var(--line)}
+@media (min-width:700px){.top{position:sticky;top:0;z-index:5}}
+.top__in{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:64px;flex-wrap:wrap}
+.logo{font-weight:800;font-size:24px;color:var(--ink);text-decoration:none;display:flex;align-items:center;gap:10px;letter-spacing:-.5px}
+.logo__dot{width:26px;height:26px;border-radius:50%;background:conic-gradient(var(--accent) 0 25%,var(--sun) 0 50%,var(--mint) 0 75%,var(--sky) 0)}
+.menu{display:flex;gap:6px;flex-wrap:wrap}
+.menu a{color:var(--ink);text-decoration:none;padding:6px 12px;border-radius:999px;font-weight:600;font-size:15px}
+.menu a:hover{background:var(--bg)}
+
+/* сетка страницы */
+.layout{display:grid;grid-template-columns:1fr;gap:32px;padding-top:8px;padding-bottom:48px}
+@media (min-width:1000px){.layout{grid-template-columns:1fr 300px}}
+.side{display:none}
+@media (min-width:1000px){.side{display:block}.side .ad{position:sticky;top:90px;min-height:600px}}
+main{min-width:0}
+
+.crumbs{font-size:14px;color:var(--muted);margin-top:16px}
+.crumbs a{color:var(--muted)}
+.hero{background:var(--paper);border-radius:var(--radius);padding:24px 28px;margin-top:20px;border:2px solid var(--line)}
+.hero h1{margin-top:0}
+.hero p,.lead{color:var(--muted);margin:0}
+.lead{margin-bottom:8px}
+
+/* карточки */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:16px}
+.card,.cat{background:var(--paper);border:2px solid var(--line);border-radius:var(--radius);text-decoration:none;color:var(--ink);padding:10px;display:flex;flex-direction:column;gap:8px;transition:transform .15s,border-color .15s}
+.card:hover,.cat:hover{transform:translateY(-3px);border-color:var(--accent)}
+.card img{aspect-ratio:600/848;object-fit:contain;border-radius:10px}
+.card span{font-weight:600;text-align:center}
+.cats{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px}
+.cat{flex-direction:row;align-items:center}
+.cat img{width:64px;height:90px;object-fit:contain;flex:none}
+.cat b{flex:1}
+.cat small{color:var(--muted)}
+
+/* страница раскраски */
+.sheet{margin:0 auto;max-width:600px;background:#fff;border:2px solid var(--line);border-radius:var(--radius);padding:16px}
+.actions{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin:20px 0 8px}
+.btn{font:inherit;font-weight:700;border:2px solid var(--ink);background:var(--paper);color:var(--ink);padding:12px 22px;border-radius:999px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{background:var(--bg)}
+.btn--main{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn--main:hover{background:var(--accent-dark);border-color:var(--accent-dark)}
+.btn--ghost{border-color:var(--line)}
+.btn[disabled]{opacity:.6;cursor:wait}
+.meta{text-align:center;color:var(--muted);font-size:15px}
+.about,.text{background:var(--paper);border-radius:var(--radius);padding:4px 24px 12px;border:2px solid var(--line)}
+
+/* рекламные места */
+.ad{margin:24px 0;text-align:center;overflow:hidden}
+.ad--placeholder{min-height:120px;display:flex;align-items:center;justify-content:center;border:2px dashed #d9cfc2;border-radius:12px;color:#a89f93;font-size:14px;background:repeating-linear-gradient(45deg,transparent 0 12px,#fbf4ea 12px 24px)}
+.ad--sidebar.ad--placeholder{min-height:600px;margin-top:24px}
+
+/* подвал и cookies */
+.foot{background:var(--paper);border-top:3px solid var(--line);padding:16px 0;font-size:14px;color:var(--muted)}
+.foot a{color:var(--muted)}
+.cookie{position:fixed;left:16px;right:16px;bottom:16px;max-width:560px;margin:0 auto;background:var(--ink);color:#fff;padding:14px 16px;border-radius:14px;font-size:14px;display:flex;gap:12px;align-items:center;z-index:10;box-shadow:0 8px 30px rgba(0,0,0,.2)}
+.cookie[hidden]{display:none}
+.cookie a{color:var(--sun)}
+.cookie button{font:inherit;font-weight:700;border:0;background:var(--sun);color:var(--ink);padding:8px 14px;border-radius:999px;cursor:pointer;flex:none}
+
+/* ПЕЧАТЬ: на листе только раскраска */
+@page{size:A4 portrait;margin:8mm}
+@media print{
+  body{background:#fff}
+  body *{visibility:hidden}
+  .sheet,.sheet *{visibility:visible}
+  .sheet{position:absolute;left:0;top:0;width:100%;max-width:none;border:0;padding:0;margin:0}
+  .sheet img{width:100%;height:auto;max-height:277mm;object-fit:contain}
+  .top,.foot,.cookie,.ad,.side{display:none!important}
+}
+
+@media (max-width:699px){
+  .top__in{min-height:56px;padding-top:8px;padding-bottom:8px;gap:4px}
+  .logo{font-size:21px}
+  .menu{gap:2px;margin:0 -10px}
+  .menu a{padding:4px 10px;font-size:14px}
+  .ad--placeholder{min-height:90px}
+  .sheet{padding:8px}
+  .btn{padding:10px 18px}
+}

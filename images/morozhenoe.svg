@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 848" width="600" height="848"><rect width="600" height="848" fill="#fff"/><g fill="#fff" stroke="#000" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+<defs><clipPath id="c"><polygon points="190,440 410,440 300,790"/></clipPath></defs>
+<polygon points="190,440 410,440 300,790"/>
+<g clip-path="url(#c)" fill="none" stroke-width="3">
+<path d="M150,470 L420,740 M150,530 L380,760 M150,590 L340,780 M170,450 L440,720 M230,440 L460,670 M290,440 L470,620 M350,440 L470,560"/>
+<path d="M450,470 L180,740 M450,530 L220,760 M450,590 L260,780 M430,450 L160,720 M370,440 L140,670 M310,440 L130,620 M250,440 L130,560"/>
+</g>
+<circle cx="300" cy="290" r="100"/>
+<circle cx="215" cy="395" r="88"/>
+<circle cx="385" cy="395" r="88"/>
+<path d="M140,430 Q300,465 460,430 L460,450 Q445,500 425,455 Q400,520 375,462 Q345,505 320,466 Q295,530 270,466 Q240,505 220,462 Q195,515 175,455 Q155,495 140,450 Z"/>
+<path d="M300,195 Q310,140 350,110" fill="none"/>
+<path d="M330,125 Q370,95 395,120 Q365,140 330,125 Z"/>
+<circle cx="300" cy="190" r="30"/>
+<path d="M290,178 Q296,172 304,174" fill="none" stroke-width="3"/>
+<g stroke-width="6"><path d="M250,250 l14,-8 M330,240 l12,10 M360,300 l-6,14 M240,320 l14,4 M290,330 l10,-10 M300,250 l-4,14"/>
+<path d="M170,370 l12,8 M240,350 l4,14 M200,430 l12,-6 M370,350 l-10,10 M420,380 l6,14 M380,430 l14,-4"/></g>
+<path d="M60,90 l12,-30 l12,30 l30,12 l-30,12 l-12,30 l-12,-30 l-30,-12 Z"/>
+<path d="M500,640 l9,-22 l9,22 l22,9 l-22,9 l-9,22 l-9,-22 l-22,-9 Z"/>
+<path d="M510,130 l7,-18 l7,18 l18,7 l-18,7 l-7,18 l-7,-18 l-18,-7 Z"/>
+</g></svg>

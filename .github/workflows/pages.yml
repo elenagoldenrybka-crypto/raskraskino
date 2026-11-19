@@ -23,11 +23,11 @@ jobs:
         with:
           node-version: 20
       - uses: actions/configure-pages@v5
-      # Без своего домена сайт живёт в подпапке /<имя-репозитория>
-      # Когда подключите свой домен, удалите строку env и BASE_PATH ниже.
+      # Сайт работает на своём домене pro-raskraski.ru (без подпапки).
+      # Если когда-нибудь вернётесь на адрес *.github.io/<репозиторий>/, добавьте:
+      #   env:
+      #     BASE_PATH: /${{ github.event.repository.name }}
       - run: node build.js
-        env:
-          BASE_PATH: /${{ github.event.repository.name }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist

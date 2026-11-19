@@ -8,7 +8,7 @@ module.exports = {
 
   // Полный адрес сайта БЕЗ слэша в конце. Нужен для sitemap.xml.
   // После покупки домена впишите его, например "https://raskraskino.ru"
-  url: "https://example.ru",
+  url: "https://pro-raskraski.ru",
 
   // Если сайт лежит в подпапке (GitHub Pages без своего домена:
   // https://ВАШ-ЛОГИН.github.io/raskraskino/), впишите "/raskraskino".

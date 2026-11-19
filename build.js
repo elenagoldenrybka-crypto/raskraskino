@@ -96,6 +96,38 @@ ${metrika()}
 </html>`;
 }
 
+// Окно просмотра: картинка, стрелки, кнопки и место под рекламу
+function viewer(current) {
+  // порядок листания: сначала та же тема, потом остальные
+  const list = pages.filter((x) => x.category === current.category)
+    .concat(pages.filter((x) => x.category !== current.category));
+  const data = list.map((x) => ({ t: x.title, s: x.slug, img: link("/img/" + x.image), url: link(pageUrl(x)) }));
+  return `
+<div class="viewer" id="viewer" hidden role="dialog" aria-modal="true" aria-label="Просмотр раскраски">
+  <div class="viewer__box">
+    <div class="viewer__main">
+      <div class="viewer__stage">
+        <button type="button" class="viewer__nav viewer__nav--prev" data-v="prev" aria-label="Предыдущая раскраска">‹</button>
+        <img class="viewer__img" id="viewer-img" src="" alt="">
+        <button type="button" class="viewer__nav viewer__nav--next" data-v="next" aria-label="Следующая раскраска">›</button>
+      </div>
+      ${ad("modal")}
+    </div>
+    <div class="viewer__side">
+      <button type="button" class="viewer__close" data-v="close" aria-label="Закрыть">×</button>
+      <p class="viewer__title" id="viewer-title"></p>
+      <button type="button" class="vbtn vbtn--print" data-v="print">🖨 Распечатать</button>
+      <button type="button" class="vbtn vbtn--down" data-v="png">⬇ Скачать PNG</button>
+      <button type="button" class="vbtn vbtn--half" data-v="half">✂ Печать на пол-листа</button>
+      <button type="button" class="vbtn vbtn--share" data-v="share">↗ Поделиться</button>
+      <p class="viewer__hint">«Пол-листа» печатает две одинаковые раскраски на одном листе А4: удобно для двоих детей и экономит бумагу.</p>
+      <p class="viewer__count" id="viewer-count"></p>
+    </div>
+  </div>
+</div>
+<script>window.GALLERY=${JSON.stringify(data).replace(/</g, "\\u003c")};window.GALLERY_START=${list.indexOf(current)};</script>`;
+}
+
 // ---------- сборка ----------
 fs.rmSync(OUT, { recursive: true, force: true });
 fs.mkdirSync(OUT, { recursive: true });
@@ -179,10 +211,13 @@ for (const p of pages) {
 <h1>${esc(p.title)}</h1>
 ${ad("top")}
 <figure class="sheet" id="sheet">
-  <img src="${img}" alt="${esc(p.title)} — контурный рисунок для раскрашивания" width="600" height="848">
+  <button type="button" class="sheet__open" data-open aria-label="Открыть раскраску в большом окне">
+    <img src="${img}" alt="${esc(p.title)} — контурный рисунок для раскрашивания" width="600" height="848">
+    <span class="sheet__zoom">Открыть и распечатать</span>
+  </button>
 </figure>
 <div class="actions">
-  <button type="button" class="btn btn--main" data-print>🖨 Распечатать</button>
+  <button type="button" class="btn btn--main" data-open>🖨 Распечатать</button>
   <button type="button" class="btn" data-png="${img}" data-name="${esc(p.slug)}">⬇ Скачать PNG</button>
   <a class="btn btn--ghost" href="${img}" download="${esc(p.slug)}.svg">Скачать SVG</a>
 </div>
@@ -195,7 +230,8 @@ ${ad("middle")}
 </section>
 ${ad("bottom")}
 <h2>Похожие раскраски</h2>
-<div class="grid">${related.map(card).join("")}</div>`,
+<div class="grid">${related.map(card).join("")}</div>
+${viewer(p)}`,
     })
   );
 }

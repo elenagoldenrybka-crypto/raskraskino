@@ -58,6 +58,7 @@ function layout({ title, description, canonical, body, breadcrumbs = [], jsonld 
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${esc(fullTitle)}</title>
 <meta name="description" content="${esc(description)}">
+<meta name="yandex-verification" content="b2cba5e0da4f8ea0">
 <link rel="canonical" href="${cfg.url}${B}${canonical}">
 <meta property="og:title" content="${esc(fullTitle)}">
 <meta property="og:description" content="${esc(description)}">
@@ -132,6 +133,9 @@ function viewer(current) {
 fs.rmSync(OUT, { recursive: true, force: true });
 fs.mkdirSync(OUT, { recursive: true });
 for (const f of ["style.css", "app.js", "favicon.svg"]) fs.copyFileSync(path.join(__dirname, "src", f), path.join(OUT, f));
+// Файлы из папки public/ копируются в корень сайта как есть (подтверждения Вебмастера и т.п.)
+const PUB = path.join(__dirname, "public");
+if (fs.existsSync(PUB)) for (const f of fs.readdirSync(PUB)) fs.copyFileSync(path.join(PUB, f), path.join(OUT, f));
 fs.mkdirSync(path.join(OUT, "img"));
 for (const f of fs.readdirSync(path.join(__dirname, "images"))) fs.copyFileSync(path.join(__dirname, "images", f), path.join(OUT, "img", f));
 

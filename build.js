@@ -223,7 +223,7 @@ ${ad("top")}
 <div class="actions">
   <button type="button" class="btn btn--main" data-open>🖨 Распечатать</button>
   <button type="button" class="btn" data-png="${img}" data-name="${esc(p.slug)}">⬇ Скачать PNG</button>
-  <a class="btn btn--ghost" href="${img}" download="${esc(p.slug)}.svg">Скачать SVG</a>
+  ${p.image.endsWith(".svg") ? `<a class="btn btn--ghost" href="${img}" download="${esc(p.slug)}.svg">Скачать SVG</a>` : ""}
 </div>
 <p class="meta">Возраст: ${esc(p.age)} · Формат: А4, вертикально · Тема: <a href="${link(catUrl(c))}">${esc(c.title)}</a></p>
 ${ad("middle")}

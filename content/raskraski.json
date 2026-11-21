@@ -1,7 +1,8 @@
 [
   {
     "slug": "raskraska-novogodnyaya-elka",
-    "category": "novyj-god",
+    "group": "novogodnyaya-elka",
+    "old": "/novyj-god/raskraska-novogodnyaya-elka/",
     "image": "ny-elka.png",
     "title": "Раскраска «Новогодняя ёлка с подарками»",
     "short": "Ёлка",
@@ -14,7 +15,8 @@
   },
   {
     "slug": "raskraska-snegurochka",
-    "category": "novyj-god",
+    "group": "snegurochka",
+    "old": "/novyj-god/raskraska-snegurochka/",
     "image": "ny-snegurochka.png",
     "title": "Раскраска «Снегурочка»",
     "short": "Снегурочка",
@@ -27,7 +29,11 @@
   },
   {
     "slug": "raskraska-olen",
-    "category": "novyj-god",
+    "group": "lesnye",
+    "also": [
+      "novyj-god"
+    ],
+    "old": "/novyj-god/raskraska-olen/",
     "image": "ny-olen.png",
     "title": "Раскраска «Северный олень»",
     "short": "Олень",
@@ -40,7 +46,11 @@
   },
   {
     "slug": "raskraska-snezhinki",
-    "category": "novyj-god",
+    "group": "zima",
+    "also": [
+      "novyj-god"
+    ],
+    "old": "/novyj-god/raskraska-snezhinki/",
     "image": "ny-snezhinki.png",
     "title": "Раскраска «Снежинки»",
     "short": "Снежинки",
@@ -53,7 +63,8 @@
   },
   {
     "slug": "raskraska-novogodnie-podarki",
-    "category": "novyj-god",
+    "group": "novyj-god",
+    "old": "/novyj-god/raskraska-novogodnie-podarki/",
     "image": "ny-podarki.png",
     "title": "Раскраска «Новогодние подарки»",
     "short": "Подарки",
@@ -66,7 +77,11 @@
   },
   {
     "slug": "raskraska-pingvin",
-    "category": "novyj-god",
+    "group": "morskie",
+    "also": [
+      "zima"
+    ],
+    "old": "/novyj-god/raskraska-pingvin/",
     "image": "ny-pingvin.png",
     "title": "Раскраска «Пингвинёнок на льдине»",
     "short": "Пингвин",
@@ -79,7 +94,8 @@
   },
   {
     "slug": "raskraska-medvezhonok-na-konkah",
-    "category": "novyj-god",
+    "group": "lesnye",
+    "old": "/novyj-god/raskraska-medvezhonok-na-konkah/",
     "image": "ny-medvezhonok.png",
     "title": "Раскраска «Медвежонок на коньках»",
     "short": "Медвежонок",
@@ -92,7 +108,8 @@
   },
   {
     "slug": "raskraska-deti-na-sankah",
-    "category": "novyj-god",
+    "group": "zima",
+    "old": "/novyj-god/raskraska-deti-na-sankah/",
     "image": "ny-sanki.png",
     "title": "Раскраска «Дети на санках»",
     "short": "Санки",
@@ -105,7 +122,11 @@
   },
   {
     "slug": "raskraska-zimnij-domik",
-    "category": "novyj-god",
+    "group": "zima",
+    "also": [
+      "novyj-god"
+    ],
+    "old": "/novyj-god/raskraska-zimnij-domik/",
     "image": "ny-domik.png",
     "title": "Раскраска «Зимний домик»",
     "short": "Домик",
@@ -118,7 +139,8 @@
   },
   {
     "slug": "raskraska-elochnye-shary",
-    "category": "novyj-god",
+    "group": "novogodnyaya-elka",
+    "old": "/novyj-god/raskraska-elochnye-shary/",
     "image": "ny-shary.png",
     "title": "Раскраска «Ёлочные шары и шишки»",
     "short": "Шары и шишки",
@@ -131,7 +153,11 @@
   },
   {
     "slug": "raskraska-kozochka-s-podarkom",
-    "category": "novyj-god",
+    "group": "novyj-god",
+    "also": [
+      "domashnie"
+    ],
+    "old": "/novyj-god/raskraska-kozochka-s-podarkom/",
     "image": "ny-kozochka.png",
     "title": "Раскраска «Козочка с подарком»",
     "short": "Козочка",
@@ -144,7 +170,8 @@
   },
   {
     "slug": "raskraska-lisichka-zimoj",
-    "category": "novyj-god",
+    "group": "lesnye",
+    "old": "/novyj-god/raskraska-lisichka-zimoj/",
     "image": "ny-lisa.png",
     "title": "Раскраска «Лисичка в шарфе»",
     "short": "Лисичка",
@@ -157,7 +184,8 @@
   },
   {
     "slug": "raskraska-novogodnij-kamin",
-    "category": "novyj-god",
+    "group": "novyj-god",
+    "old": "/novyj-god/raskraska-novogodnij-kamin/",
     "image": "ny-kamin.png",
     "title": "Раскраска «Новогодний камин»",
     "short": "Камин",
@@ -170,7 +198,8 @@
   },
   {
     "slug": "raskraska-belochka-s-shishkoj",
-    "category": "novyj-god",
+    "group": "lesnye",
+    "old": "/novyj-god/raskraska-belochka-s-shishkoj/",
     "image": "ny-belochka.png",
     "title": "Раскраска «Белочка с шишкой»",
     "short": "Белочка",
@@ -183,7 +212,8 @@
   },
   {
     "slug": "raskraska-sova-zimoj",
-    "category": "novyj-god",
+    "group": "lesnye",
+    "old": "/novyj-god/raskraska-sova-zimoj/",
     "image": "ny-sova.png",
     "title": "Раскраска «Сова под луной»",
     "short": "Сова",
@@ -196,7 +226,11 @@
   },
   {
     "slug": "raskraska-morozhenoe",
-    "category": "eda",
+    "group": "sladosti",
+    "also": [
+      "prostye"
+    ],
+    "old": "/eda/raskraska-morozhenoe/",
     "image": "morozhenoe.svg",
     "title": "Раскраска «Мороженое в рожке»",
     "short": "Мороженое",
@@ -209,7 +243,11 @@
   },
   {
     "slug": "raskraska-kotik",
-    "category": "zhivotnye",
+    "group": "domashnie",
+    "also": [
+      "prostye"
+    ],
+    "old": "/zhivotnye/raskraska-kotik/",
     "image": "kotik.svg",
     "title": "Раскраска «Котик»",
     "short": "Котик",
@@ -222,7 +260,11 @@
   },
   {
     "slug": "raskraska-rybka",
-    "category": "zhivotnye",
+    "group": "morskie",
+    "also": [
+      "prostye"
+    ],
+    "old": "/zhivotnye/raskraska-rybka/",
     "image": "rybka.svg",
     "title": "Раскраска «Рыбка и водоросли»",
     "short": "Рыбка",
@@ -235,7 +277,11 @@
   },
   {
     "slug": "raskraska-babochka",
-    "category": "priroda",
+    "group": "nasekomye",
+    "also": [
+      "prostye"
+    ],
+    "old": "/priroda/raskraska-babochka/",
     "image": "babochka.svg",
     "title": "Раскраска «Бабочка»",
     "short": "Бабочка",
@@ -248,7 +294,11 @@
   },
   {
     "slug": "raskraska-cvetok",
-    "category": "priroda",
+    "group": "cvety",
+    "also": [
+      "prostye"
+    ],
+    "old": "/priroda/raskraska-cvetok/",
     "image": "cvetok.svg",
     "title": "Раскраска «Цветок в горшке»",
     "short": "Цветок",
@@ -261,7 +311,8 @@
   },
   {
     "slug": "raskraska-domik",
-    "category": "priroda",
+    "group": "prostye",
+    "old": "/priroda/raskraska-domik/",
     "image": "domik.svg",
     "title": "Раскраска «Домик с солнышком»",
     "short": "Домик",
@@ -274,7 +325,11 @@
   },
   {
     "slug": "raskraska-mashinka",
-    "category": "transport",
+    "group": "mashiny",
+    "also": [
+      "prostye"
+    ],
+    "old": "/transport/raskraska-mashinka/",
     "image": "mashinka.svg",
     "title": "Раскраска «Машинка на дороге»",
     "short": "Машинка",
@@ -287,7 +342,8 @@
   },
   {
     "slug": "raskraska-raketa",
-    "category": "transport",
+    "group": "kosmos",
+    "old": "/transport/raskraska-raketa/",
     "image": "raketa.svg",
     "title": "Раскраска «Ракета в космосе»",
     "short": "Ракета",
@@ -300,7 +356,8 @@
   },
   {
     "slug": "raskraska-ded-moroz",
-    "category": "novyj-god",
+    "group": "ded-moroz",
+    "old": "/novyj-god/raskraska-ded-moroz/",
     "image": "ded-moroz.png",
     "title": "Раскраска «Дед Мороз с подарками»",
     "short": "Дед Мороз",
@@ -313,7 +370,11 @@
   },
   {
     "slug": "raskraska-snegovik",
-    "category": "novyj-god",
+    "group": "zima",
+    "also": [
+      "novyj-god"
+    ],
+    "old": "/novyj-god/raskraska-snegovik/",
     "image": "snegovik.png",
     "title": "Раскраска «Снеговик в лесу»",
     "short": "Снеговик",
@@ -326,7 +387,8 @@
   },
   {
     "slug": "raskraska-zajchik-s-morkovkoj",
-    "category": "zhivotnye",
+    "group": "lesnye",
+    "old": "/zhivotnye/raskraska-zajchik-s-morkovkoj/",
     "image": "zayac.png",
     "title": "Раскраска «Зайчик с морковкой»",
     "short": "Зайчик",
@@ -339,7 +401,8 @@
   },
   {
     "slug": "raskraska-edinorog",
-    "category": "zhivotnye",
+    "group": "skazochnye",
+    "old": "/zhivotnye/raskraska-edinorog/",
     "image": "edinorog.png",
     "title": "Раскраска «Единорог и радуга»",
     "short": "Единорог",

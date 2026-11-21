@@ -4,7 +4,7 @@ const fs = require("fs");
 const path = require("path");
 
 const cfg = require("./site.config.js");
-const categories = require("./content/categories.json");
+const sections = require("./content/sections.json");
 const pages = require("./content/raskraski.json");
 
 const OUT = path.join(__dirname, "dist");
@@ -15,9 +15,30 @@ const year = new Date().getFullYear();
 const esc = (s) =>
   String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const link = (p) => `${B}${p}`;
-const catBySlug = Object.fromEntries(categories.map((c) => [c.slug, c]));
-const pageUrl = (p) => `/${p.category}/${p.slug}/`;
-const catUrl = (c) => `/${c.slug}/`;
+// Разделы → подгруппы → раскраски
+const groups = [];
+for (const s of sections) for (const g of s.groups) { g.section = s; groups.push(g); }
+const groupBySlug = Object.fromEntries(groups.map((g) => [g.slug, g]));
+for (const p of pages) {
+  p.g = groupBySlug[p.group];
+  if (!p.g) throw new Error(`У раскраски ${p.slug} неизвестная подгруппа «${p.group}»`);
+  for (const a of p.also || []) if (!groupBySlug[a]) throw new Error(`У раскраски ${p.slug} неизвестная подгруппа «${a}»`);
+}
+const pageUrl = (p) => `/${p.g.section.slug}/${p.g.slug}/${p.slug}/`;
+const secUrl = (s) => `/${s.slug}/`;
+const groupUrl = (g) => `/${g.section.slug}/${g.slug}/`;
+const inGroup = (p, g) => p.group === g.slug || (p.also || []).includes(g.slug);
+const inSection = (p, s) => s.groups.some((g) => inGroup(p, g));
+const hasCover = (name) => fs.existsSync(path.join(__dirname, "images", name));
+// Цветная заставка: images/cover-s-<раздел>.jpg или images/cover-g-<подгруппа>.jpg; если её нет — первая раскраска
+function coverOf(kind, obj, list) {
+  const name = `cover-${kind}-${obj.slug}.jpg`;
+  if (hasCover(name)) return { src: link("/img/" + name), color: true };
+  return list[0] ? { src: link("/img/" + list[0].image), color: false } : null;
+}
+function tile(url, title, cov, n) {
+  return `<a class="tile" href="${link(url)}"><span class="tile__img${cov && !cov.color ? " tile__img--line" : ""}">${cov ? `<img src="${cov.src}" alt="" loading="lazy" width="240" height="240">` : ""}</span><b>${esc(title)}</b>${n != null ? `<small>${n} шт.</small>` : ""}</a>`;
+}
 
 function write(rel, content) {
   const file = path.join(OUT, rel);
@@ -44,7 +65,19 @@ function card(p) {
   <span>${esc(p.short)}</span></a>`;
 }
 
-function layout({ title, description, canonical, body, breadcrumbs = [], jsonld = null }) {
+function sideNav(cur) {
+  return `<nav class="snav" aria-label="Разделы">${sections
+    .map((s) => {
+      const open = cur && cur.slug === s.slug;
+      const subs = open
+        ? `<div class="snav__sub">${s.groups.filter((g) => pages.some((p) => inGroup(p, g))).map((g) => `<a href="${link(groupUrl(g))}">${esc(g.title)}</a>`).join("")}</div>`
+        : "";
+      return `<a class="snav__item${open ? " is-open" : ""}" href="${link(secUrl(s))}">Раскраски: ${esc(s.title)}</a>${subs}`;
+    })
+    .join("")}</nav>`;
+}
+
+function layout({ title, description, canonical, body, breadcrumbs = [], jsonld = null, section = null, head = "" }) {
   const fullTitle = title === cfg.name ? `${cfg.name} — ${cfg.tagline}` : `${title} — ${cfg.name}`;
   const crumbs = breadcrumbs.length
     ? `<nav class="crumbs" aria-label="Навигация"><a href="${link("/")}">Главная</a>${breadcrumbs
@@ -65,6 +98,7 @@ function layout({ title, description, canonical, body, breadcrumbs = [], jsonld 
 <meta property="og:type" content="website">
 <link rel="icon" href="${link("/favicon.svg")}" type="image/svg+xml">
 <link rel="stylesheet" href="${link("/style.css")}">
+${head}
 ${jsonld ? `<script type="application/ld+json">${JSON.stringify(jsonld)}</script>` : ""}
 ${metrika()}
 </head>
@@ -72,10 +106,11 @@ ${metrika()}
 <header class="top">
   <div class="wrap top__in">
     <a class="logo" href="${link("/")}"><span class="logo__dot"></span>${esc(cfg.name)}</a>
-    <nav class="menu">${categories.map((c) => `<a href="${link(catUrl(c))}">${esc(c.short)}</a>`).join("")}</nav>
+    <nav class="menu">${sections.map((s) => `<a href="${link(secUrl(s))}">${esc(s.title)}</a>`).join("")}</nav>
   </div>
 </header>
 <div class="wrap layout">
+  <aside class="lnav">${sideNav(section)}</aside>
   <main>
     ${crumbs}
     ${body}
@@ -100,8 +135,10 @@ ${metrika()}
 // Окно просмотра: картинка, стрелки, кнопки и место под рекламу
 function viewer(current) {
   // порядок листания: сначала та же тема, потом остальные
-  const list = pages.filter((x) => x.category === current.category)
-    .concat(pages.filter((x) => x.category !== current.category));
+  const s = current.g.section;
+  const list = pages.filter((x) => x.group === current.group)
+    .concat(pages.filter((x) => x.group !== current.group && inSection(x, s)))
+    .concat(pages.filter((x) => !inSection(x, s)));
   const data = list.map((x) => ({ t: x.title, s: x.slug, img: link("/img/" + x.image), url: link(pageUrl(x)) }));
   return `
 <div class="viewer" id="viewer" hidden role="dialog" aria-modal="true" aria-label="Просмотр раскраски">
@@ -146,7 +183,7 @@ write(
   "index.html",
   layout({
     title: cfg.name,
-    description: `${cfg.tagline}. Раскраски по темам: ${categories.map((c) => c.short.toLowerCase()).join(", ")}. Скачать в хорошем качестве или распечатать на А4.`,
+    description: `${cfg.tagline}. Разделы: ${sections.map((c) => c.title.toLowerCase()).join(", ")}. Скачать в хорошем качестве или распечатать на А4.`,
     canonical: "/",
     body: `
 <section class="hero">
@@ -154,13 +191,9 @@ write(
   <p>Выберите картинку, нажмите «Распечатать» или «Скачать». Все раскраски — формата А4, с чёткими контурами.</p>
 </section>
 ${ad("top")}
-<h2>Темы</h2>
-<div class="cats">${categories
-      .map((c) => {
-        const first = pages.find((p) => p.category === c.slug);
-        const n = pages.filter((p) => p.category === c.slug).length;
-        return `<a class="cat" href="${link(catUrl(c))}">${first ? `<img src="${link("/img/" + first.image)}" alt="" loading="lazy">` : ""}<b>${esc(c.title)}</b><small>${n} шт.</small></a>`;
-      })
+<h2>Разделы</h2>
+<div class="tiles">${sections
+      .map((sec) => { const l = sorted.filter((p) => inSection(p, sec)); return l.length ? tile(secUrl(sec), sec.title, coverOf("s", sec, l), l.length) : ""; })
       .join("")}</div>
 ${ad("middle")}
 <h2>Новые раскраски</h2>
@@ -169,40 +202,70 @@ ${ad("bottom")}`,
   })
 );
 
-// Категории
-for (const c of categories) {
-  const list = sorted.filter((p) => p.category === c.slug);
+// Разделы
+for (const sec of sections) {
+  const all = sorted.filter((p) => inSection(p, sec));
+  if (!all.length) continue;
+  const gs = sec.groups.map((g) => ({ g, l: sorted.filter((p) => inGroup(p, g)) })).filter((x) => x.l.length);
   write(
-    `${c.slug}/index.html`,
+    `${sec.slug}/index.html`,
     layout({
-      title: `Раскраски: ${c.title.toLowerCase()}`,
-      description: c.description,
-      canonical: catUrl(c),
-      breadcrumbs: [{ title: c.title }],
+      title: `Раскраски: ${sec.title.toLowerCase()}`,
+      description: sec.description,
+      canonical: secUrl(sec),
+      section: sec,
+      breadcrumbs: [{ title: sec.title }],
       body: `
-<h1>Раскраски: ${esc(c.title.toLowerCase())}</h1>
-<p class="lead">${esc(c.description)}</p>
+<h1>Раскраски: ${esc(sec.title.toLowerCase())}</h1>
+<p class="lead">${esc(sec.description)}</p>
 ${ad("top")}
-<div class="grid">${list.map(card).join("")}</div>
+<div class="tiles">${gs.map(({ g, l }) => tile(groupUrl(g), g.title, coverOf("g", g, l), l.length)).join("")}</div>
+${ad("middle")}
+<h2>Все раскраски раздела</h2>
+<div class="grid">${all.map(card).join("")}</div>
 ${ad("bottom")}`,
     })
   );
+  // Подгруппы
+  for (const { g, l } of gs) {
+    const others = gs.filter((x) => x.g !== g);
+    write(
+      `${sec.slug}/${g.slug}/index.html`,
+      layout({
+        title: `Раскраски «${g.title}»`,
+        description: `${g.description} Скачать бесплатно или распечатать на А4.`,
+        canonical: groupUrl(g),
+        section: sec,
+        breadcrumbs: [{ title: sec.title, url: secUrl(sec) }, { title: g.title }],
+        body: `
+<h1>Раскраски «${esc(g.title)}»</h1>
+<p class="lead">${esc(g.description)}</p>
+${ad("top")}
+<div class="grid">${l.map(card).join("")}</div>
+${ad("bottom")}
+${others.length ? `<h2>Ещё в разделе «${esc(sec.title)}»</h2>
+<div class="tiles">${others.map((x) => tile(groupUrl(x.g), x.g.title, coverOf("g", x.g, x.l), x.l.length)).join("")}</div>` : ""}`,
+      })
+    );
+  }
 }
 
 // Страницы раскрасок
 for (const p of pages) {
-  const c = catBySlug[p.category];
-  const related = sorted.filter((x) => x.slug !== p.slug && x.category === p.category)
-    .concat(sorted.filter((x) => x.category !== p.category))
+  const g = p.g, sec = g.section;
+  const related = sorted.filter((x) => x.slug !== p.slug && inGroup(x, g))
+    .concat(sorted.filter((x) => x.slug !== p.slug && !inGroup(x, g) && inSection(x, sec)))
+    .concat(sorted.filter((x) => !inSection(x, sec)))
     .slice(0, 4);
   const img = link("/img/" + p.image);
   write(
-    `${p.category}/${p.slug}/index.html`,
+    `${sec.slug}/${g.slug}/${p.slug}/index.html`,
     layout({
       title: p.title,
       description: `${p.title} — скачать бесплатно и распечатать на А4. ${p.text[0]}`.slice(0, 160),
       canonical: pageUrl(p),
-      breadcrumbs: [{ title: c.title, url: catUrl(c) }, { title: p.short }],
+      section: sec,
+      breadcrumbs: [{ title: sec.title, url: secUrl(sec) }, { title: g.title, url: groupUrl(g) }, { title: p.short }],
       jsonld: {
         "@context": "https://schema.org",
         "@type": "ImageObject",
@@ -225,7 +288,7 @@ ${ad("top")}
   <button type="button" class="btn" data-png="${img}" data-name="${esc(p.slug)}">⬇ Скачать PNG</button>
   ${p.image.endsWith(".svg") ? `<a class="btn btn--ghost" href="${img}" download="${esc(p.slug)}.svg">Скачать SVG</a>` : ""}
 </div>
-<p class="meta">Возраст: ${esc(p.age)} · Формат: А4, вертикально · Тема: <a href="${link(catUrl(c))}">${esc(c.title)}</a></p>
+<p class="meta">Возраст: ${esc(p.age)} · Формат: А4, вертикально · Раздел: <a href="${link(groupUrl(g))}">${esc(g.title)}</a></p>
 ${ad("middle")}
 <section class="about">
   <h2>Об этой раскраске</h2>
@@ -261,8 +324,18 @@ simple("privacy", "Политика конфиденциальности", `
 
 write("404.html", layout({ title: "Страница не найдена", description: "Страница не найдена", canonical: "/404.html", body: `<h1>Страница не найдена</h1><p>Попробуйте начать с <a href="${link("/")}">главной страницы</a>.</p>` }));
 
+// Старые адреса (до разделов) → переадресация на новые
+function redirect(from, to) {
+  if (fs.existsSync(path.join(OUT, from, "index.html"))) return;
+  const u = `${cfg.url}${B}${to}`;
+  write(`${from.replace(/^\//, "")}index.html`, `<!doctype html><html lang="ru"><head><meta charset="utf-8"><title>Страница переехала</title><link rel="canonical" href="${u}"><meta name="robots" content="noindex"><meta http-equiv="refresh" content="0; url=${link(to)}"><script>location.replace(${JSON.stringify(link(to))}+location.search)</script></head><body><p>Страница переехала: <a href="${link(to)}">${u}</a></p></body></html>`);
+}
+for (const p of pages) if (p.old && p.old !== pageUrl(p)) redirect(p.old, pageUrl(p));
+const oldCats = { "novyj-god": "/prazdniki/novyj-god/" };
+for (const [from, to] of Object.entries(oldCats)) redirect(`/${from}/`, to);
+
 // sitemap.xml, robots.txt, ads.txt
-const urls = ["/", ...categories.map(catUrl), ...pages.map(pageUrl), "/o-sajte/", "/kontakty/", "/privacy/"];
+const urls = ["/", ...sections.filter((x) => pages.some((p) => inSection(p, x))).map(secUrl), ...groups.filter((g) => pages.some((p) => inGroup(p, g))).map(groupUrl), ...pages.map(pageUrl), "/o-sajte/", "/kontakty/", "/privacy/"];
 const lastmod = (u) => (pages.find((p) => pageUrl(p) === u) || {}).added || new Date().toISOString().slice(0, 10);
 write(
   "sitemap.xml",
@@ -273,4 +346,4 @@ write(
 write("robots.txt", `User-agent: *\nAllow: /\n\nSitemap: ${cfg.url}${B}/sitemap.xml\n`);
 if (cfg.adsensePublisherId) write("ads.txt", `google.com, ${cfg.adsensePublisherId}, DIRECT, f08c47fec0942fa0\n`);
 
-console.log(`Готово: ${pages.length} раскрасок, тем: ${categories.length} → папка dist/`);
+console.log(`Готово: ${pages.length} раскрасок, разделов: ${sections.length}, подгрупп: ${groups.length} → папка dist/`);

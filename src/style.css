@@ -149,3 +149,18 @@ main{min-width:0}
 .snav__sub a{display:block;padding:6px 16px 6px 28px;color:var(--ink);text-decoration:none;font-size:14px}
 .snav__sub a:hover{color:var(--accent-dark)}
 @media (max-width:699px){.top .menu{flex-wrap:nowrap;overflow-x:auto;width:100%;padding-bottom:8px;-webkit-overflow-scrolling:touch}.top .menu a{white-space:nowrap;background:var(--bg)}}
+
+/* поиск в шапке */
+.search{display:flex;gap:6px;flex:1;max-width:420px;margin-left:auto}
+.search input{flex:1;min-width:0;font:inherit;font-size:15px;padding:9px 14px;border:2px solid var(--line);border-radius:999px;background:var(--bg);color:var(--ink)}
+.search input:focus{outline:none;border-color:var(--accent)}
+.search button{font:inherit;font-size:15px;font-weight:700;border:0;background:var(--accent);color:#fff;padding:9px 18px;border-radius:999px;cursor:pointer}
+.search button:hover{background:var(--accent-dark)}
+.search--page{max-width:560px;margin:0 0 12px}
+@media (max-width:699px){.top .search{order:3;max-width:none;width:100%;margin:0 0 8px}}
+
+/* кнопка Pinterest */
+.sheet{position:relative}
+.pin{position:absolute;left:12px;top:12px;z-index:2;display:inline-flex;align-items:center;gap:5px;background:#e60023;color:#fff;font-size:13px;font-weight:700;text-decoration:none;padding:6px 10px;border-radius:8px;opacity:.92}
+.pin:hover{opacity:1;background:#ad081b}
+.vbtn--pin{background:#e60023;color:#fff;border-color:#e60023}

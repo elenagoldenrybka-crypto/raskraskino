@@ -106,6 +106,7 @@ ${metrika()}
 <header class="top">
   <div class="wrap top__in">
     <a class="logo" href="${link("/")}"><span class="logo__dot"></span>${esc(cfg.name)}</a>
+    <form class="search" action="${link("/poisk/")}" method="get" role="search"><input type="search" name="q" placeholder="Найти раскраски" aria-label="Поиск раскрасок" required><button type="submit">Искать</button></form>
     <nav class="menu">${sections.map((s) => `<a href="${link(secUrl(s))}">${esc(s.title)}</a>`).join("")}</nav>
   </div>
 </header>
@@ -131,6 +132,11 @@ ${metrika()}
 </body>
 </html>`;
 }
+
+// Кнопка «Сохранить в Pinterest»: Пинтерест сам заберёт картинку и поставит ссылку на страницу
+const pinHref = (p) =>
+  `https://www.pinterest.com/pin/create/button/?url=${encodeURIComponent(cfg.url + link(pageUrl(p)))}&media=${encodeURIComponent(cfg.url + link("/img/" + p.image))}&description=${encodeURIComponent(p.title + " — скачать и распечатать бесплатно")}`;
+const pinBtn = (p) => `<a class="pin" href="${pinHref(p)}" target="_blank" rel="noopener nofollow" aria-label="Сохранить в Pinterest"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 0 0-3.6 19.3c-.1-.8-.2-2 0-2.9l1.2-5s-.3-.6-.3-1.5c0-1.4.8-2.5 1.8-2.5.9 0 1.3.6 1.3 1.4 0 .9-.5 2.2-.8 3.4-.2 1 .5 1.9 1.6 1.9 1.9 0 3.3-2 3.3-4.9 0-2.5-1.8-4.3-4.4-4.3-3 0-4.8 2.3-4.8 4.6 0 .9.3 1.9.8 2.4l.1.4-.3 1.2c0 .2-.2.3-.4.2-1.4-.6-2.2-2.6-2.2-4.2 0-3.4 2.5-6.6 7.2-6.6 3.8 0 6.7 2.7 6.7 6.3 0 3.7-2.4 6.8-5.6 6.8-1.1 0-2.2-.6-2.5-1.3l-.7 2.6c-.2 1-.9 2.2-1.4 2.9A10 10 0 1 0 12 2z"/></svg>Сохранить</a>`;
 
 // Окно просмотра: картинка, стрелки, кнопки и место под рекламу
 function viewer(current) {
@@ -158,6 +164,7 @@ function viewer(current) {
       <button type="button" class="vbtn vbtn--down" data-v="png">⬇ Скачать PNG</button>
       <button type="button" class="vbtn vbtn--half" data-v="half">✂ Печать на пол-листа</button>
       <button type="button" class="vbtn vbtn--share" data-v="share">↗ Поделиться</button>
+      <button type="button" class="vbtn vbtn--pin" data-v="pin">📌 Сохранить в Pinterest</button>
       <p class="viewer__hint">«Пол-листа» печатает две одинаковые раскраски на одном листе А4: удобно для двоих детей и экономит бумагу.</p>
       <p class="viewer__count" id="viewer-count"></p>
     </div>
@@ -278,6 +285,7 @@ for (const p of pages) {
 <h1>${esc(p.title)}</h1>
 ${ad("top")}
 <figure class="sheet" id="sheet">
+  ${pinBtn(p)}
   <button type="button" class="sheet__open" data-open aria-label="Открыть раскраску в большом окне">
     <img src="${img}" alt="${esc(p.title)} — контурный рисунок для раскрашивания" width="600" height="848">
     <span class="sheet__zoom">Открыть и распечатать</span>
@@ -302,6 +310,37 @@ ${viewer(p)}`,
     })
   );
 }
+
+// Поиск: индекс для браузера и страница результатов
+write(
+  "search-index.json",
+  JSON.stringify(
+    sorted.map((p) => ({
+      t: p.title,
+      s: p.short,
+      u: link(pageUrl(p)),
+      i: link("/img/" + p.image),
+      k: [p.g.section.title, p.g.title, ...(p.also || []).map((a) => groupBySlug[a].title), p.text[0]].join(" "),
+    }))
+  )
+);
+write(
+  "poisk/index.html",
+  layout({
+    title: "Поиск раскрасок",
+    description: `Поиск раскрасок на сайте ${cfg.name}`,
+    canonical: "/poisk/",
+    head: `<meta name="robots" content="noindex">`,
+    breadcrumbs: [{ title: "Поиск" }],
+    body: `
+<h1>Поиск раскрасок</h1>
+<form class="search search--page" action="${link("/poisk/")}" method="get" role="search"><input type="search" name="q" id="q" placeholder="Например: котик, принцесса, Новый год" aria-label="Поиск раскрасок"><button type="submit">Искать</button></form>
+<p class="lead" id="search-status"></p>
+<div class="grid" id="search-results"></div>
+${ad("bottom")}
+<script>window.SEARCH_INDEX=${JSON.stringify(link("/search-index.json"))};</script>`,
+  })
+);
 
 // Служебные страницы
 const simple = (slug, title, html) =>

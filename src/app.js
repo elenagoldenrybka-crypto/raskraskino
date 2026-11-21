@@ -68,6 +68,37 @@
     else prompt("Скопируйте ссылку:", url);
   }
 
+  function pin(it) {
+    var u = "https://www.pinterest.com/pin/create/button/?url=" + encodeURIComponent(location.origin + it.url) +
+      "&media=" + encodeURIComponent(location.origin + it.img) + "&description=" + encodeURIComponent(it.t + " — скачать и распечатать бесплатно");
+    window.open(u, "_blank", "noopener,width=750,height=600");
+  }
+
+  // Поиск
+  var res = document.getElementById("search-results");
+  if (res && window.SEARCH_INDEX) {
+    var norm = function (x) { return String(x).toLowerCase().replace(/ё/g, "е"); };
+    var q = (new URLSearchParams(location.search).get("q") || "").trim();
+    var qi = document.getElementById("q"), st = document.getElementById("search-status");
+    if (qi) qi.value = q;
+    if (q) {
+      st.textContent = "Ищем…";
+      fetch(window.SEARCH_INDEX).then(function (r) { return r.json(); }).then(function (list) {
+        var words = norm(q).split(/\s+/).filter(Boolean).map(function (w) {
+          var ends = ["иками", "ами", "ями", "ики", "ов", "ев", "ей", "ой", "ий", "ый", "ая", "ое", "ые", "ие", "ки", "ка", "а", "я", "ы", "и", "е", "у", "ю", "о", "ь"];
+          for (var j = 0; j < ends.length; j++) if (w.length - ends[j].length >= 3 && w.slice(-ends[j].length) === ends[j]) return w.slice(0, -ends[j].length);
+          return w;
+        });
+        var found = list.filter(function (p) { var h = norm(p.t + " " + p.s + " " + p.k); return words.every(function (w) { return h.indexOf(w) !== -1; }); });
+        st.textContent = found.length ? "Найдено раскрасок: " + found.length : "По запросу «" + q + "» ничего не нашлось. Попробуйте другое слово или загляните в разделы слева.";
+        res.innerHTML = found.map(function (p) {
+          var e = function (x) { return String(x).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); };
+          return '<a class="card" href="' + e(p.u) + '"><img src="' + e(p.i) + '" alt="' + e(p.t) + '" loading="lazy" width="300" height="424"><span>' + e(p.s) + "</span></a>";
+        }).join("");
+      }).catch(function () { st.textContent = "Не удалось загрузить поиск. Обновите страницу."; });
+    } else st.textContent = "Введите, что хотите найти: животное, праздник, героя сказки.";
+  }
+
   document.querySelectorAll("[data-open]").forEach(function (b) {
     b.addEventListener("click", function () { cur = window.GALLERY_START || 0; openV(); });
   });
@@ -83,6 +114,7 @@
       else if (a === "half") printImg(it.img, true);
       else if (a === "png") downloadPng(it.img, it.s, b);
       else if (a === "share") share(b);
+      else if (a === "pin") pin(it);
     });
     document.addEventListener("keydown", function (e) {
       if (V.hidden) return;

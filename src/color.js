@@ -147,6 +147,7 @@
       var lum = (d[q] * 299 + d[q + 1] * 587 + d[q + 2] * 114) / 1000;
       if (lum < 165) wall[p] = 1;
     }
+    wall = thicken(wall, W, H, 2);
     lines.width = W; lines.height = H;
     lines.getContext("2d").drawImage(lc, 0, 0);
     linesReady = lc;
@@ -213,6 +214,13 @@
   }
 
   // ---------- заливка ----------
+  // Утолщение линий на R px: заливка не «протекает» через мелкие разрывы в контурах
+  function thicken(src, w, h, R) {
+    var tmp = new Uint8Array(w * h), out = new Uint8Array(w * h), x, y, k, run;
+    for (y = 0; y < h; y++) { run = -1e9; for (x = 0; x < w; x++) { if (src[y * w + x]) run = x; if (x - run <= R) tmp[y * w + x] = 1; } run = 1e9; for (x = w - 1; x >= 0; x--) { if (src[y * w + x]) run = x; if (run - x <= R) tmp[y * w + x] = 1; } }
+    for (x = 0; x < w; x++) { run = -1e9; for (y = 0; y < h; y++) { if (tmp[y * w + x]) run = y; if (y - run <= R) out[y * w + x] = 1; } run = 1e9; for (y = h - 1; y >= 0; y--) { if (tmp[y * w + x]) run = y; if (run - y <= R) out[y * w + x] = 1; } }
+    return out;
+  }
   function hex(c) { var n = parseInt(c.slice(1), 16); return [n >> 16 & 255, n >> 8 & 255, n & 255]; }
   function fill(px, py) {
     px = Math.floor(px); py = Math.floor(py);
@@ -244,18 +252,25 @@
       }
       if (l < minX) minX = l; if (rr > maxX) maxX = rr; if (y < minY) minY = y; if (y > maxY) maxY = y;
     }
-    // чуть заходим под линию, чтобы у краёв не оставалось белых зазоров
-    minX = Math.max(0, minX - 2); minY = Math.max(0, minY - 2); maxX = Math.min(W - 1, maxX + 2); maxY = Math.min(H - 1, maxY + 2);
+    // Линии для заливки «утолщены» на 2 px (так закрываются мелкие разрывы в контурах),
+    // поэтому после заливки расширяем область на 3 px — под утолщение и под саму линию,
+    // но не дальше в соседние области.
+    var G = 3;
+    minX = Math.max(0, minX - G); minY = Math.max(0, minY - G); maxX = Math.min(W - 1, maxX + G); maxY = Math.min(H - 1, maxY + G);
     var bw = maxX - minX + 1, bh = maxY - minY + 1;
+    for (var it = 0; it < G; it++) {
+      var add = [];
+      for (var ya = minY; ya <= maxY; ya++) for (var xa = minX; xa <= maxX; xa++) {
+        var ia = ya * W + xa;
+        if (mask[ia] || !wall[ia]) continue;
+        if ((xa > 0 && mask[ia - 1] === 1) || (xa < W - 1 && mask[ia + 1] === 1) || (ya > 0 && mask[ia - W] === 1) || (ya < H - 1 && mask[ia + W] === 1)) add.push(ia);
+      }
+      for (var ka = 0; ka < add.length; ka++) mask[add[ka]] = 1;
+    }
     var before = snap(minX, minY, bw, bh);
     var img = ctx.getImageData(minX, minY, bw, bh), d = img.data, c = hex(color);
     for (var yy2 = minY; yy2 <= maxY; yy2++) for (var xx2 = minX; xx2 <= maxX; xx2++) {
-      var i2 = yy2 * W + xx2, on = mask[i2];
-      if (!on && wall[i2]) {
-        on = (xx2 > 0 && mask[i2 - 1]) || (xx2 < W - 1 && mask[i2 + 1]) || (yy2 > 0 && mask[i2 - W]) || (yy2 < H - 1 && mask[i2 + W]) ||
-          (xx2 > 1 && mask[i2 - 2]) || (xx2 < W - 2 && mask[i2 + 2]) || (yy2 > 1 && mask[i2 - 2 * W]) || (yy2 < H - 2 && mask[i2 + 2 * W]);
-      }
-      if (on) { var o = ((yy2 - minY) * bw + (xx2 - minX)) * 4; d[o] = c[0]; d[o + 1] = c[1]; d[o + 2] = c[2]; d[o + 3] = 255; }
+      if (mask[yy2 * W + xx2]) { var o = ((yy2 - minY) * bw + (xx2 - minX)) * 4; d[o] = c[0]; d[o + 1] = c[1]; d[o + 2] = c[2]; d[o + 3] = 255; }
     }
     ctx.putImageData(img, minX, minY);
     pushUndo(before);

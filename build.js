@@ -98,6 +98,10 @@ function layout({ title, description, canonical, body, breadcrumbs = [], jsonld 
 <meta property="og:type" content="website">
 <link rel="icon" href="${link("/favicon.svg")}" type="image/svg+xml">
 <link rel="stylesheet" href="${link("/style.css")}">
+<link rel="manifest" href="${link("/manifest.webmanifest")}">
+<meta name="theme-color" content="#ff6b5a">
+<link rel="apple-touch-icon" href="${link("/icons/apple-touch-icon.png")}">
+<meta name="apple-mobile-web-app-title" content="${esc(cfg.name)}">
 ${head}
 ${jsonld ? `<script type="application/ld+json">${JSON.stringify(jsonld)}</script>` : ""}
 ${metrika()}
@@ -121,18 +125,20 @@ ${metrika()}
 <footer class="foot">
   <div class="wrap">
     <p>© ${year} ${esc(cfg.name)}. Все раскраски бесплатны для личного некоммерческого использования.</p>
-    <p><a href="${link("/o-sajte/")}">О сайте</a> · <a href="${link("/privacy/")}">Политика конфиденциальности</a> · <a href="${link("/kontakty/")}">Контакты</a></p>
+    <p><a href="${link("/moi-raskraski/")}">Мои раскраски</a> · <a href="${link("/raskrasit/")}">Раскрасить онлайн</a> · <a href="${link("/o-sajte/")}">О сайте</a> · <a href="${link("/privacy/")}">Политика конфиденциальности</a> · <a href="${link("/kontakty/")}">Контакты</a></p>
   </div>
 </footer>
 <div class="cookie" id="cookie" hidden>
   <span>Мы используем cookies и сервисы аналитики, чтобы сайт работал лучше. Подробнее — в <a href="${link("/privacy/")}">политике конфиденциальности</a>.</span>
   <button type="button" id="cookie-ok">Понятно</button>
 </div>
+<script>window.BASE=${JSON.stringify(B)};window.YM_ID=${JSON.stringify(String(cfg.yandexMetrikaId || "").replace(/\D/g, ""))};</script>
 <script src="${link("/app.js")}" defer></script>
 </body>
 </html>`;
 }
 
+const paintUrl = (p) => link(`/raskrasit/?r=${encodeURIComponent(p.slug)}`);
 // Кнопка «Сохранить в Pinterest»: Пинтерест сам заберёт картинку и поставит ссылку на страницу
 const pinHref = (p) =>
   `https://www.pinterest.com/pin/create/button/?url=${encodeURIComponent(cfg.url + link(pageUrl(p)))}&media=${encodeURIComponent(cfg.url + link("/img/" + p.image))}&description=${encodeURIComponent(p.title + " — скачать и распечатать бесплатно")}`;
@@ -145,7 +151,7 @@ function viewer(current) {
   const list = pages.filter((x) => x.group === current.group)
     .concat(pages.filter((x) => x.group !== current.group && inSection(x, s)))
     .concat(pages.filter((x) => !inSection(x, s)));
-  const data = list.map((x) => ({ t: x.title, s: x.slug, img: link("/img/" + x.image), url: link(pageUrl(x)) }));
+  const data = list.map((x) => ({ t: x.title, s: x.slug, img: link("/img/" + x.image), url: link(pageUrl(x)), paint: paintUrl(x) }));
   return `
 <div class="viewer" id="viewer" hidden role="dialog" aria-modal="true" aria-label="Просмотр раскраски">
   <div class="viewer__box">
@@ -160,6 +166,7 @@ function viewer(current) {
     <div class="viewer__side">
       <button type="button" class="viewer__close" data-v="close" aria-label="Закрыть">×</button>
       <p class="viewer__title" id="viewer-title"></p>
+      <a class="vbtn vbtn--paint" id="viewer-paint" href="#">🎨 Раскрасить онлайн</a>
       <button type="button" class="vbtn vbtn--print" data-v="print">🖨 Распечатать</button>
       <button type="button" class="vbtn vbtn--down" data-v="png">⬇ Скачать PNG</button>
       <button type="button" class="vbtn vbtn--half" data-v="half">✂ Печать на пол-листа</button>
@@ -176,7 +183,32 @@ function viewer(current) {
 // ---------- сборка ----------
 fs.rmSync(OUT, { recursive: true, force: true });
 fs.mkdirSync(OUT, { recursive: true });
-for (const f of ["style.css", "app.js", "favicon.svg"]) fs.copyFileSync(path.join(__dirname, "src", f), path.join(OUT, f));
+for (const f of ["style.css", "app.js", "color.js", "favicon.svg"]) fs.copyFileSync(path.join(__dirname, "src", f), path.join(OUT, f));
+fs.mkdirSync(path.join(OUT, "icons"));
+for (const f of fs.readdirSync(path.join(__dirname, "src", "icons"))) fs.copyFileSync(path.join(__dirname, "src", "icons", f), path.join(OUT, "icons", f));
+// Приложение на телефон (PWA): манифест и сервис-воркер
+write("sw.js", fs.readFileSync(path.join(__dirname, "src", "sw.js"), "utf8").replace("__BASE__", B).replace("__VERSION__", Date.now().toString(36)));
+write("manifest.webmanifest", JSON.stringify({
+  name: `${cfg.name} — раскраски онлайн`,
+  short_name: cfg.name,
+  description: "Раскрашивайте картинки прямо в телефоне, сохраняйте и печатайте",
+  lang: "ru",
+  start_url: `${B}/?utm_source=app`,
+  scope: `${B}/`,
+  display: "standalone",
+  orientation: "portrait",
+  background_color: "#fffaf3",
+  theme_color: "#ff6b5a",
+  icons: [
+    { src: `${B}/icons/icon-192.png`, sizes: "192x192", type: "image/png" },
+    { src: `${B}/icons/icon-512.png`, sizes: "512x512", type: "image/png" },
+    { src: `${B}/icons/icon-maskable-512.png`, sizes: "512x512", type: "image/png", purpose: "maskable" },
+  ],
+  shortcuts: [
+    { name: "Мои раскраски", url: `${B}/moi-raskraski/` },
+    { name: "Раскрасить онлайн", url: `${B}/raskrasit/` },
+  ],
+}, null, 1));
 // Файлы из папки public/ копируются в корень сайта как есть (подтверждения Вебмастера и т.п.)
 const PUB = path.join(__dirname, "public");
 if (fs.existsSync(PUB)) for (const f of fs.readdirSync(PUB)) fs.copyFileSync(path.join(PUB, f), path.join(OUT, f));
@@ -201,6 +233,7 @@ write(
 <section class="hero">
   <h1>Бесплатные раскраски для детей</h1>
   <p>Выберите картинку, нажмите «Распечатать» или «Скачать». Все раскраски — формата А4, с чёткими контурами.</p>
+  <p class="hero__paint">🎨 Новое: любую картинку можно <a href="${link("/raskrasit/")}">раскрасить онлайн</a> прямо в телефоне, сохранить и распечатать. <button type="button" class="linkbtn" data-install hidden>Установить как приложение</button></p>
 </section>
 ${ad("top")}
 <h2>Разделы</h2>
@@ -299,6 +332,7 @@ ${ad("top")}
   </button>
 </figure>
 <div class="actions">
+  <a class="btn btn--paint" href="${paintUrl(p)}">🎨 Раскрасить онлайн</a>
   <button type="button" class="btn btn--main" data-open>🖨 Распечатать</button>
   ${hasPdf(`${p.slug}.pdf`) ? `<a class="btn" href="${link(`/pdf/${p.slug}.pdf`)}" download>⬇ Скачать PDF</a>` : ""}
   <button type="button" class="btn" data-png="${img}" data-name="${esc(p.slug)}">⬇ Скачать PNG</button>
@@ -318,6 +352,81 @@ ${viewer(p)}`,
     })
   );
 }
+
+// Онлайн-раскрашивание и «Мои раскраски»
+const PALETTE = ["#e53935","#ff6b5a","#ff8a65","#fb8c00","#ffb300","#ffd54f","#fff176","#c0ca33","#7cb342","#43a047","#2e7d32","#26a69a","#4dd0e1","#29b6f6","#1e88e5","#3949ab","#7e57c2","#ab47bc","#ec407a","#f8bbd0","#ffccbc","#d7a77a","#8d6e63","#5d4037","#9e9e9e","#424242","#212121","#ffffff"];
+write(
+  "raskrasit/index.html",
+  layout({
+    title: "Раскрасить онлайн",
+    description: "Раскрашивайте картинки онлайн прямо в телефоне или на компьютере: заливка одним касанием, кисть, ластик. Готовую раскраску можно сохранить и распечатать.",
+    canonical: "/raskrasit/",
+    head: `<meta name="robots" content="noindex, follow">`,
+    breadcrumbs: [{ title: "Раскрасить онлайн" }],
+    body: `
+<div class="paint" id="paint">
+  <div class="paint__head">
+    <h1 id="paint-title">Раскрасить онлайн</h1>
+    <a class="paint__back" id="paint-back" href="${link("/")}">‹ К раскраске</a>
+  </div>
+  <div class="paint__bar" role="toolbar" aria-label="Инструменты">
+    <button type="button" class="pbtn" data-tool="fill" title="Заливка: нажмите на часть рисунка">🪣<span>Заливка</span></button>
+    <button type="button" class="pbtn" data-tool="brush" title="Кисть">🖌<span>Кисть</span></button>
+    <button type="button" class="pbtn" data-tool="erase" title="Ластик">🧽<span>Ластик</span></button>
+    <span class="paint__sep"></span>
+    <button type="button" class="pbtn" id="paint-undo" data-act="undo" title="Отменить">↶<span>Назад</span></button>
+    <button type="button" class="pbtn" id="paint-redo" data-act="redo" title="Вернуть">↷<span>Вперёд</span></button>
+    <button type="button" class="pbtn pbtn--wide" data-act="zin" title="Увеличить">＋</button>
+    <button type="button" class="pbtn pbtn--wide" data-act="zout" title="Уменьшить">－</button>
+  </div>
+  <div class="paint__stage" id="paint-stage">
+    <div class="paint__zoom" id="paint-zoom">
+      <canvas id="paint-color"></canvas>
+      <canvas id="paint-lines" aria-label="Раскраска"></canvas>
+    </div>
+  </div>
+  <p class="paint__status" id="paint-status" aria-live="polite"></p>
+  <div class="paint__size" id="paint-size-box" hidden><label for="paint-size">Толщина кисти</label><input type="range" id="paint-size" min="4" max="70" value="18"></div>
+  <div class="paint__colors" aria-label="Цвета">
+    <span class="paint__cur" id="paint-cur" title="Текущий цвет"></span>
+    ${PALETTE.map((c) => `<button type="button" class="sw" data-color="${c}" style="background:${c}" aria-label="Цвет ${c}"></button>`).join("")}
+    <label class="sw sw--custom" title="Свой цвет"><input type="color" id="paint-custom" value="#ff6b5a" aria-label="Свой цвет">+</label>
+  </div>
+  <div class="paint__actions">
+    <button type="button" class="btn btn--main" data-act="save">💾 Сохранить картинку</button>
+    <button type="button" class="btn" data-act="print">🖨 Распечатать</button>
+    <a class="btn btn--ghost" href="${link("/moi-raskraski/")}">⭐ Мои раскраски</a>
+    <button type="button" class="btn btn--ghost" data-act="clear">🗑 Начать заново</button>
+  </div>
+  <p class="paint__hint">Как раскрашивать: выберите цвет и нажмите на часть рисунка, она зальётся целиком. Мелкие детали удобно увеличить двумя пальцами. Раскраска сохраняется сама, её можно продолжить позже в разделе «Мои раскраски». <button type="button" class="linkbtn" data-install hidden>📲 Установить «${esc(cfg.name)}» как приложение</button></p>
+</div>
+<div id="paint-pick" hidden>
+  <h1>Раскрасить онлайн</h1>
+  <p class="lead">Выберите картинку: её можно раскрасить прямо в телефоне или на компьютере, сохранить и распечатать.</p>
+  <div class="grid">${sorted.map((p) => `<a class="card" href="${paintUrl(p)}"><img src="${link("/img/" + p.image)}" alt="${esc(p.title)}" loading="lazy" width="300" height="424"><span>${esc(p.short)}</span></a>`).join("")}</div>
+</div>
+${ad("bottom")}
+<script>window.PAINT_LIST=${JSON.stringify(sorted.map((p) => ({ s: p.slug, t: p.title, i: link("/img/" + p.image), u: link(pageUrl(p)) }))).replace(/</g, "\\u003c")};</script>
+<script src="${link("/color.js")}" defer></script>`,
+  })
+);
+write(
+  "moi-raskraski/index.html",
+  layout({
+    title: "Мои раскраски",
+    description: "Раскраски, которые вы раскрашивали онлайн на этом устройстве.",
+    canonical: "/moi-raskraski/",
+    head: `<meta name="robots" content="noindex, follow">`,
+    breadcrumbs: [{ title: "Мои раскраски" }],
+    body: `
+<h1>Мои раскраски</h1>
+<p class="lead">Здесь хранятся картинки, которые вы раскрашивали онлайн на этом телефоне или компьютере. Нажмите на картинку, чтобы продолжить, сохранить или распечатать её. <button type="button" class="linkbtn" data-install hidden>📲 Установить как приложение</button></p>
+<p class="lead" id="my-empty" hidden>Пока здесь пусто. Откройте любую раскраску и нажмите «🎨 Раскрасить онлайн» или <a href="${link("/raskrasit/")}">выберите картинку здесь</a>.</p>
+<div class="grid works" id="my-works"></div>
+${ad("bottom")}
+<script src="${link("/color.js")}" defer></script>`,
+  })
+);
 
 // Поиск: индекс для браузера и страница результатов
 write(

@@ -14,6 +14,7 @@
     document.getElementById("viewer-img").alt = it.t;
     document.getElementById("viewer-title").textContent = it.t;
     document.getElementById("viewer-count").textContent = (cur + 1) + " / " + G.length;
+    var pl = document.getElementById("viewer-paint"); if (pl && it.paint) pl.href = it.paint;
   }
   function openV() { if (!V) return; show(cur); V.hidden = false; document.body.classList.add("no-scroll"); V.querySelector(".viewer__close").focus(); }
   function closeV() { V.hidden = true; document.body.classList.remove("no-scroll"); }
@@ -133,6 +134,28 @@
   document.querySelectorAll("[data-png]").forEach(function (b) {
     b.addEventListener("click", function () { downloadPng(b.getAttribute("data-png"), b.getAttribute("data-name"), b); });
   });
+
+  // ---------- установка как приложение ----------
+  var deferred = null;
+  window.addEventListener("beforeinstallprompt", function (e) { e.preventDefault(); deferred = e; showInstall(); });
+  function showInstall() {
+    document.querySelectorAll("[data-install]").forEach(function (b) {
+      var standalone = matchMedia("(display-mode: standalone)").matches || navigator.standalone;
+      if (standalone) return;
+      var ios = /iphone|ipad|ipod/i.test(navigator.userAgent);
+      if (deferred || ios) b.hidden = false;
+      b.onclick = function () {
+        if (deferred) { deferred.prompt(); deferred.userChoice.then(function (c) { if (c.outcome === "accepted") { try { if (window.ym && window.YM_ID) ym(window.YM_ID, "reachGoal", "app_install"); } catch (e) {}; b.hidden = true; } deferred = null; }); }
+        else alert("Чтобы добавить «Раскраскино» на экран телефона: нажмите кнопку «Поделиться» внизу Safari и выберите «На экран „Домой“».");
+      };
+    });
+  }
+  showInstall();
+
+  // Приложение: сервис-воркер (работа без интернета, установка на экран телефона)
+  if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) {
+    window.addEventListener("load", function () { navigator.serviceWorker.register((window.BASE || "") + "/sw.js").catch(function () {}); });
+  }
 
   try {
     var box = document.getElementById("cookie");

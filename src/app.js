@@ -14,7 +14,7 @@
     document.getElementById("viewer-img").alt = it.t;
     document.getElementById("viewer-title").textContent = it.t;
     document.getElementById("viewer-count").textContent = (cur + 1) + " / " + G.length;
-    var pl = document.getElementById("viewer-paint"); if (pl && it.paint) pl.href = it.paint;
+    var pl = document.getElementById("viewer-paint"); if (pl) { pl.hidden = !it.paint; if (it.paint) pl.href = it.paint; }
   }
   function openV() { if (!V) return; show(cur); V.hidden = false; document.body.classList.add("no-scroll"); V.querySelector(".viewer__close").focus(); }
   function closeV() { V.hidden = true; document.body.classList.remove("no-scroll"); }

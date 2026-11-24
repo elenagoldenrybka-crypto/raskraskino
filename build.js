@@ -138,6 +138,18 @@ ${metrika()}
 </html>`;
 }
 
+// Какие картинки годятся для раскрашивания заливкой (контуры замкнуты)
+const { analyze } = require("./tools/zalivka.js");
+const leakCache = {};
+function paintable(p) {
+  if ((cfg.paintExclude || []).includes(p.slug)) return false;
+  if ((cfg.paintExcludeGroups || []).includes(p.group)) return false;
+  if (!p.image.endsWith(".png")) return true;
+  if (!(p.image in leakCache)) {
+    try { const r = analyze(path.join(__dirname, "images", p.image)); leakCache[p.image] = r ? r.leak : 0; } catch (e) { leakCache[p.image] = 0; }
+  }
+  return leakCache[p.image] <= (cfg.paintMaxLeak ?? 0.3);
+}
 const paintUrl = (p) => link(`/raskrasit/?r=${encodeURIComponent(p.slug)}`);
 // Кнопка «Сохранить в Pinterest»: Пинтерест сам заберёт картинку и поставит ссылку на страницу
 const pinHref = (p) =>
@@ -151,7 +163,7 @@ function viewer(current) {
   const list = pages.filter((x) => x.group === current.group)
     .concat(pages.filter((x) => x.group !== current.group && inSection(x, s)))
     .concat(pages.filter((x) => !inSection(x, s)));
-  const data = list.map((x) => ({ t: x.title, s: x.slug, img: link("/img/" + x.image), url: link(pageUrl(x)), paint: paintUrl(x) }));
+  const data = list.map((x) => ({ t: x.title, s: x.slug, img: link("/img/" + x.image), url: link(pageUrl(x)), paint: paintable(x) ? paintUrl(x) : "" }));
   return `
 <div class="viewer" id="viewer" hidden role="dialog" aria-modal="true" aria-label="Просмотр раскраски">
   <div class="viewer__box">
@@ -332,7 +344,7 @@ ${ad("top")}
   </button>
 </figure>
 <div class="actions">
-  <a class="btn btn--paint" href="${paintUrl(p)}">🎨 Раскрасить онлайн</a>
+  ${paintable(p) ? `<a class="btn btn--paint" href="${paintUrl(p)}">🎨 Раскрасить онлайн</a>` : ""}
   <button type="button" class="btn btn--main" data-open>🖨 Распечатать</button>
   ${hasPdf(`${p.slug}.pdf`) ? `<a class="btn" href="${link(`/pdf/${p.slug}.pdf`)}" download>⬇ Скачать PDF</a>` : ""}
   <button type="button" class="btn" data-png="${img}" data-name="${esc(p.slug)}">⬇ Скачать PNG</button>
@@ -403,10 +415,10 @@ write(
 <div id="paint-pick" hidden>
   <h1>Раскрасить онлайн</h1>
   <p class="lead">Выберите картинку: её можно раскрасить прямо в телефоне или на компьютере, сохранить и распечатать.</p>
-  <div class="grid">${sorted.map((p) => `<a class="card" href="${paintUrl(p)}"><img src="${link("/img/" + p.image)}" alt="${esc(p.title)}" loading="lazy" width="300" height="424"><span>${esc(p.short)}</span></a>`).join("")}</div>
+  <div class="grid">${sorted.filter(paintable).map((p) => `<a class="card" href="${paintUrl(p)}"><img src="${link("/img/" + p.image)}" alt="${esc(p.title)}" loading="lazy" width="300" height="424"><span>${esc(p.short)}</span></a>`).join("")}</div>
 </div>
 ${ad("bottom")}
-<script>window.PAINT_LIST=${JSON.stringify(sorted.map((p) => ({ s: p.slug, t: p.title, i: link("/img/" + p.image), u: link(pageUrl(p)) }))).replace(/</g, "\\u003c")};</script>
+<script>window.PAINT_LIST=${JSON.stringify(sorted.filter(paintable).map((p) => ({ s: p.slug, t: p.title, i: link("/img/" + p.image), u: link(pageUrl(p)) }))).replace(/</g, "\\u003c")};</script>
 <script src="${link("/color.js")}" defer></script>`,
   })
 );

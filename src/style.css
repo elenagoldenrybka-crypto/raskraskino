@@ -219,3 +219,4 @@ main{min-width:0}
   .paint__actions .btn{flex:1 1 45%;justify-content:center;padding:12px 10px;font-size:15px}
   .actions .btn--paint{order:-1;width:100%;justify-content:center}
 }
+.vbtn[hidden]{display:none}

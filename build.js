@@ -182,6 +182,11 @@ const PUB = path.join(__dirname, "public");
 if (fs.existsSync(PUB)) for (const f of fs.readdirSync(PUB)) fs.copyFileSync(path.join(PUB, f), path.join(OUT, f));
 fs.mkdirSync(path.join(OUT, "img"));
 for (const f of fs.readdirSync(path.join(__dirname, "images"))) fs.copyFileSync(path.join(__dirname, "images", f), path.join(OUT, "img", f));
+// PDF для печати (делает tools/make_pdf.py)
+const PDF = path.join(__dirname, "pdf");
+const hasPdf = (n) => fs.existsSync(path.join(PDF, n));
+if (fs.existsSync(PDF)) { fs.mkdirSync(path.join(OUT, "pdf")); for (const f of fs.readdirSync(PDF)) fs.copyFileSync(path.join(PDF, f), path.join(OUT, "pdf", f)); }
+const plural = (n) => (n % 10 === 1 && n % 100 !== 11 ? "раскраска" : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? "раскраски" : "раскрасок");
 
 const sorted = [...pages].sort((a, b) => b.added.localeCompare(a.added));
 
@@ -247,9 +252,11 @@ ${ad("bottom")}`,
         body: `
 <h1>Раскраски «${esc(g.title)}»</h1>
 <p class="lead">${esc(g.description)}</p>
+${hasPdf(`sbornik-${g.slug}.pdf`) ? `<p class="pdfall"><a class="btn btn--main" href="${link(`/pdf/sbornik-${g.slug}.pdf`)}" download>📚 Скачать все ${l.length} ${plural(l.length)} одним PDF</a><span>Сборник для печати на А4: удобно для детского сада, школы и дома.</span></p>` : ""}
 ${ad("top")}
 <div class="grid">${l.map(card).join("")}</div>
 ${ad("bottom")}
+<section class="about"><h2>Как распечатать</h2><p>Откройте раскраску и нажмите «Распечатать»: на листе А4 будет только рисунок, без меню сайта. Можно скачать отдельную раскраску в PDF или PNG, а всю подборку — одним PDF-файлом. Лучше всего подходит обычная офисная бумага плотностью 80 г/м², для фломастеров и красок — плотнее.</p></section>
 ${others.length ? `<h2>Ещё в разделе «${esc(sec.title)}»</h2>
 <div class="tiles">${others.map((x) => tile(groupUrl(x.g), x.g.title, coverOf("g", x.g, x.l), x.l.length)).join("")}</div>` : ""}`,
       })
@@ -293,6 +300,7 @@ ${ad("top")}
 </figure>
 <div class="actions">
   <button type="button" class="btn btn--main" data-open>🖨 Распечатать</button>
+  ${hasPdf(`${p.slug}.pdf`) ? `<a class="btn" href="${link(`/pdf/${p.slug}.pdf`)}" download>⬇ Скачать PDF</a>` : ""}
   <button type="button" class="btn" data-png="${img}" data-name="${esc(p.slug)}">⬇ Скачать PNG</button>
   ${p.image.endsWith(".svg") ? `<a class="btn btn--ghost" href="${img}" download="${esc(p.slug)}.svg">Скачать SVG</a>` : ""}
 </div>

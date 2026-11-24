@@ -164,3 +164,5 @@ main{min-width:0}
 .pin{position:absolute;left:12px;top:12px;z-index:2;display:inline-flex;align-items:center;gap:5px;background:#e60023;color:#fff;font-size:13px;font-weight:700;text-decoration:none;padding:6px 10px;border-radius:8px;opacity:.92}
 .pin:hover{opacity:1;background:#ad081b}
 .vbtn--pin{background:#e60023;color:#fff;border-color:#e60023}
+.pdfall{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;margin:0 0 18px}
+.pdfall span{color:#6b6873;font-size:.95rem}

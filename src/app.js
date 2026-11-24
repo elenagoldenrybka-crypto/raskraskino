@@ -25,8 +25,8 @@
     document.body.appendChild(f);
     var css = half
       ? "@page{size:A4 landscape;margin:8mm}body{margin:0;display:flex;height:100vh;align-items:center}img{width:50%;height:100%;object-fit:contain;box-sizing:border-box;padding:0 4mm}img+img{border-left:1px dashed #999}"
-      : "@page{size:A4 portrait;margin:8mm}body{margin:0;height:100vh;display:flex;align-items:center;justify-content:center}img{width:100%;height:100%;object-fit:contain}";
-    var imgs = half ? '<img src="' + src + '"><img src="' + src + '">' : '<img src="' + src + '">';
+      : "@page{size:A4 portrait;margin:8mm}body{margin:0;height:100vh;display:flex;align-items:center;justify-content:center}img{width:100%;height:calc(100% - 6mm);object-fit:contain;display:block}p{margin:1mm 0 0;font:8pt sans-serif;color:#888;text-align:center}";
+    var imgs = half ? '<img src="' + src + '"><img src="' + src + '">' : '<div style="width:100%;height:100%"><img src="' + src + '"><p>Раскраски бесплатно: ' + location.hostname + '</p></div>';
     var d = f.contentWindow.document;
     d.open(); d.write("<!doctype html><html><head><style>" + css + "</style></head><body>" + imgs + "</body></html>"); d.close();
     var go = function () { f.contentWindow.focus(); f.contentWindow.print(); window.focus(); setTimeout(function () { f.remove(); }, 60000); };

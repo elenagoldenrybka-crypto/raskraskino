@@ -512,6 +512,39 @@ write(
     .map((u) => `  <url><loc>${cfg.url}${B}${u}</loc><lastmod>${lastmod(u)}</lastmod></url>`)
     .join("\n")}\n</urlset>\n`
 );
+// RSS-лента для Пинтереста и Дзена: новые раскраски с вертикальной картинкой-пином.
+// В ленту попадают только раскраски, добавленные ПОСЛЕ 25.11.2026: всё более раннее
+// уже стоит в расписании файла pinterest-vse-piny.csv, иначе пины задублируются.
+const RSS_FROM = "2026-11-25";
+{
+  const items = [...pages].filter((p) => p.added > RSS_FROM).filter((p) => fs.existsSync(path.join(__dirname, "images", `pin-${p.slug.replace(/^raskraska-/, "")}.jpg`)))
+    .sort((a, b) => b.added.localeCompare(a.added) || a.slug.localeCompare(b.slug)).slice(0, 60);
+  const rss = items.map((p, i) => {
+    const pin = `${cfg.url}${B}/img/pin-${p.slug.replace(/^raskraska-/, "")}.jpg`;
+    const url = `${cfg.url}${B}${pageUrl(p)}`;
+    const date = new Date(`${p.added}T09:00:00+03:00`); date.setMinutes(date.getMinutes() - i);
+    return `  <item>
+    <title>${esc(p.title)}</title>
+    <link>${url}</link>
+    <guid isPermaLink="true">${url}</guid>
+    <pubDate>${date.toUTCString()}</pubDate>
+    <category>${esc(p.g.title)}</category>
+    <description>${esc(`<img src="${pin}" alt="${p.title}"><p>${p.title} — скачать бесплатно и распечатать на А4. ${p.text[0]}</p>`)}</description>
+    <enclosure url="${pin}" type="image/jpeg" length="0"/>
+  </item>`;
+  }).join("\n");
+  write("rss.xml", `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+<channel>
+  <title>${esc(cfg.name)} — новые раскраски</title>
+  <link>${cfg.url}${B}/</link>
+  <description>${esc(cfg.tagline)}</description>
+  <language>ru</language>
+${rss}
+</channel>
+</rss>
+`);
+}
 write("robots.txt", `User-agent: *\nAllow: /\n\nSitemap: ${cfg.url}${B}/sitemap.xml\n`);
 if (cfg.adsensePublisherId) write("ads.txt", `google.com, ${cfg.adsensePublisherId}, DIRECT, f08c47fec0942fa0\n`);
 

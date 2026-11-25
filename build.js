@@ -92,6 +92,7 @@ function layout({ title, description, canonical, body, breadcrumbs = [], jsonld 
 <title>${esc(fullTitle)}</title>
 <meta name="description" content="${esc(description)}">
 <meta name="yandex-verification" content="b2cba5e0da4f8ea0">
+<meta name="p:domain_verify" content="e04f822ae8e32799d191a0e5a5712e13"/>
 <link rel="canonical" href="${cfg.url}${B}${canonical}">
 <meta property="og:title" content="${esc(fullTitle)}">
 <meta property="og:description" content="${esc(description)}">

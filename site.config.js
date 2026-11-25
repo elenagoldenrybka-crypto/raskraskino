@@ -16,7 +16,8 @@ module.exports = {
   basePath: process.env.BASE_PATH || "",
 
   // Контакт для страниц «О сайте» и «Политика конфиденциальности»
-  email: "hello@example.ru",
+  email: "", // своя почта для связи; пусто = связь через группу ВК
+  vk: "https://vk.ru/pro_raskraski",
 
   // Номер счётчика Яндекс Метрики (только цифры). Пусто — счётчик не подключается.
   yandexMetrikaId: "114392373",

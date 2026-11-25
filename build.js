@@ -481,7 +481,7 @@ simple("o-sajte", "О сайте", `
 <p>«${esc(cfg.name)}» — сборник бесплатных раскрасок для детей и взрослых. Все рисунки нарисованы специально для сайта.</p>
 <p>Раскраски можно скачивать и печатать для себя, для занятий с детьми дома, в детском саду или школе. Продавать и выкладывать их на других сайтах нельзя.</p>`);
 
-simple("kontakty", "Контакты", `<p>Пишите на почту: <a href="mailto:${esc(cfg.email)}">${esc(cfg.email)}</a>. Мы рады идеям для новых раскрасок!</p><p>Подписывайтесь на нашу группу <a href="https://vk.ru/pro_raskraski" target="_blank" rel="noopener">ВКонтакте</a> и на <a href="https://www.pinterest.com/Elena_raskraskino/" target="_blank" rel="noopener">Pinterest</a>: там мы показываем новые раскраски.</p>`);
+simple("kontakty", "Контакты", `<p>${cfg.email ? `Пишите на почту: <a href="mailto:${esc(cfg.email)}">${esc(cfg.email)}</a> или в сообщения нашей <a href="${cfg.vk}" target="_blank" rel="noopener">группы ВКонтакте</a>.` : `Пишите нам в сообщения <a href="${cfg.vk}" target="_blank" rel="noopener">группы ВКонтакте</a>.`} Мы рады идеям для новых раскрасок!</p><p>Подписывайтесь на нашу группу <a href="${cfg.vk}" target="_blank" rel="noopener">ВКонтакте</a> и на <a href="https://www.pinterest.com/Elena_raskraskino/" target="_blank" rel="noopener">Pinterest</a>: там мы показываем новые раскраски.</p>`);
 
 simple("privacy", "Политика конфиденциальности", `
 <p><i>Это шаблон. Перед запуском впишите свои данные и при сомнениях покажите текст юристу.</i></p>
@@ -490,7 +490,7 @@ simple("privacy", "Политика конфиденциальности", `
 <p>3. На сайте показывается реклама Рекламной сети Яндекса и/или Google AdSense. Эти сервисы могут использовать cookie, чтобы показывать более подходящую рекламу. Подробнее: <a href="https://yandex.ru/legal/confidential/" rel="nofollow">политика Яндекса</a>, <a href="https://policies.google.com/technologies/ads?hl=ru" rel="nofollow">политика Google</a>.</p>
 <p>4. Вы можете отключить cookie в настройках браузера. Сайт при этом продолжит работать.</p>
 <p>5. Продолжая пользоваться сайтом, вы соглашаетесь с обработкой данных, указанной выше, в соответствии с Федеральным законом № 152-ФЗ «О персональных данных».</p>
-<p>6. Вопросы по обработке данных: <a href="mailto:${esc(cfg.email)}">${esc(cfg.email)}</a>.</p>`);
+<p>6. Вопросы по обработке данных: ${cfg.email ? `<a href="mailto:${esc(cfg.email)}">${esc(cfg.email)}</a>` : `пишите в сообщения <a href="${cfg.vk}" target="_blank" rel="noopener">группы ВКонтакте</a>`}.</p>`);
 
 write("404.html", layout({ title: "Страница не найдена", description: "Страница не найдена", canonical: "/404.html", body: `<h1>Страница не найдена</h1><p>Попробуйте начать с <a href="${link("/")}">главной страницы</a>.</p>` }));
 

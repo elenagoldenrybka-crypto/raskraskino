@@ -126,6 +126,7 @@ ${metrika()}
 <footer class="foot">
   <div class="wrap">
     <p>© ${year} ${esc(cfg.name)}. Все раскраски бесплатны для личного некоммерческого использования.</p>
+    <p class="soc">Новые раскраски каждый день: <a href="https://vk.ru/pro_raskraski" target="_blank" rel="noopener">мы ВКонтакте</a> · <a href="https://www.pinterest.com/Elena_raskraskino/" target="_blank" rel="noopener">мы в Pinterest</a></p>
     <p><a href="${link("/moi-raskraski/")}">Мои раскраски</a> · <a href="${link("/raskrasit/")}">Раскрасить онлайн</a> · <a href="${link("/o-sajte/")}">О сайте</a> · <a href="${link("/privacy/")}">Политика конфиденциальности</a> · <a href="${link("/kontakty/")}">Контакты</a></p>
   </div>
 </footer>
@@ -480,7 +481,7 @@ simple("o-sajte", "О сайте", `
 <p>«${esc(cfg.name)}» — сборник бесплатных раскрасок для детей и взрослых. Все рисунки нарисованы специально для сайта.</p>
 <p>Раскраски можно скачивать и печатать для себя, для занятий с детьми дома, в детском саду или школе. Продавать и выкладывать их на других сайтах нельзя.</p>`);
 
-simple("kontakty", "Контакты", `<p>Пишите на почту: <a href="mailto:${esc(cfg.email)}">${esc(cfg.email)}</a>. Мы рады идеям для новых раскрасок!</p>`);
+simple("kontakty", "Контакты", `<p>Пишите на почту: <a href="mailto:${esc(cfg.email)}">${esc(cfg.email)}</a>. Мы рады идеям для новых раскрасок!</p><p>Подписывайтесь на нашу группу <a href="https://vk.ru/pro_raskraski" target="_blank" rel="noopener">ВКонтакте</a> и на <a href="https://www.pinterest.com/Elena_raskraskino/" target="_blank" rel="noopener">Pinterest</a>: там мы показываем новые раскраски.</p>`);
 
 simple("privacy", "Политика конфиденциальности", `
 <p><i>Это шаблон. Перед запуском впишите свои данные и при сомнениях покажите текст юристу.</i></p>

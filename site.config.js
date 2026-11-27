@@ -29,7 +29,7 @@ module.exports = {
   // всё равно «протекает», впишите сюда адрес раскраски (slug), и кнопки у неё не будет.
   paintExclude: [],
   // Подгруппы, где раскрашивание заливкой не нужно
-  paintExcludeGroups: ["po-tochkam"],
+  paintExcludeGroups: ["po-tochkam", "vytynanki"],
   // Насколько сильно может «протекать» заливка (0–1). Меньше — строже.
   paintMaxLeak: 0.3,
 

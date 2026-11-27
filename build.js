@@ -156,7 +156,7 @@ const paintUrl = (p) => link(`/raskrasit/?r=${encodeURIComponent(p.slug)}`);
 // Кнопка «Сохранить в Pinterest»: Пинтерест сам заберёт картинку и поставит ссылку на страницу
 const pinHref = (p) =>
   `https://www.pinterest.com/pin/create/button/?url=${encodeURIComponent(cfg.url + link(pageUrl(p)))}&media=${encodeURIComponent(cfg.url + link("/img/" + p.image))}&description=${encodeURIComponent(p.title + " — скачать и распечатать бесплатно")}`;
-const pinBtn = (p) => `<a class="pin" href="${pinHref(p)}" target="_blank" rel="noopener nofollow" aria-label="Сохранить в Pinterest"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 0 0-3.6 19.3c-.1-.8-.2-2 0-2.9l1.2-5s-.3-.6-.3-1.5c0-1.4.8-2.5 1.8-2.5.9 0 1.3.6 1.3 1.4 0 .9-.5 2.2-.8 3.4-.2 1 .5 1.9 1.6 1.9 1.9 0 3.3-2 3.3-4.9 0-2.5-1.8-4.3-4.4-4.3-3 0-4.8 2.3-4.8 4.6 0 .9.3 1.9.8 2.4l.1.4-.3 1.2c0 .2-.2.3-.4.2-1.4-.6-2.2-2.6-2.2-4.2 0-3.4 2.5-6.6 7.2-6.6 3.8 0 6.7 2.7 6.7 6.3 0 3.7-2.4 6.8-5.6 6.8-1.1 0-2.2-.6-2.5-1.3l-.7 2.6c-.2 1-.9 2.2-1.4 2.9A10 10 0 1 0 12 2z"/></svg>Сохранить</a>`;
+const pinBtn = (p) => !cfg.pinterestSave ? "" : `<a class="pin" href="${pinHref(p)}" target="_blank" rel="noopener nofollow" aria-label="Сохранить в Pinterest"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 0 0-3.6 19.3c-.1-.8-.2-2 0-2.9l1.2-5s-.3-.6-.3-1.5c0-1.4.8-2.5 1.8-2.5.9 0 1.3.6 1.3 1.4 0 .9-.5 2.2-.8 3.4-.2 1 .5 1.9 1.6 1.9 1.9 0 3.3-2 3.3-4.9 0-2.5-1.8-4.3-4.4-4.3-3 0-4.8 2.3-4.8 4.6 0 .9.3 1.9.8 2.4l.1.4-.3 1.2c0 .2-.2.3-.4.2-1.4-.6-2.2-2.6-2.2-4.2 0-3.4 2.5-6.6 7.2-6.6 3.8 0 6.7 2.7 6.7 6.3 0 3.7-2.4 6.8-5.6 6.8-1.1 0-2.2-.6-2.5-1.3l-.7 2.6c-.2 1-.9 2.2-1.4 2.9A10 10 0 1 0 12 2z"/></svg>Сохранить</a>`;
 
 // Окно просмотра: картинка, стрелки, кнопки и место под рекламу
 function viewer(current) {
@@ -185,7 +185,7 @@ function viewer(current) {
       <button type="button" class="vbtn vbtn--down" data-v="png">⬇ Скачать PNG</button>
       <button type="button" class="vbtn vbtn--half" data-v="half">✂ Печать на пол-листа</button>
       <button type="button" class="vbtn vbtn--share" data-v="share">↗ Поделиться</button>
-      <button type="button" class="vbtn vbtn--pin" data-v="pin">📌 Сохранить в Pinterest</button>
+      ${cfg.pinterestSave ? `<button type="button" class="vbtn vbtn--pin" data-v="pin">📌 Сохранить в Pinterest</button>` : ""}
       <p class="viewer__hint">«Пол-листа» печатает две одинаковые раскраски на одном листе А4: удобно для двоих детей и экономит бумагу.</p>
       <p class="viewer__count" id="viewer-count"></p>
     </div>
@@ -498,7 +498,7 @@ write("404.html", layout({ title: "Страница не найдена", descri
 function redirect(from, to) {
   if (fs.existsSync(path.join(OUT, from, "index.html"))) return;
   const u = `${cfg.url}${B}${to}`;
-  write(`${from.replace(/^\//, "")}index.html`, `<!doctype html><html lang="ru"><head><meta charset="utf-8"><title>Страница переехала</title><link rel="canonical" href="${u}"><meta name="robots" content="noindex"><meta http-equiv="refresh" content="0; url=${link(to)}"><script>location.replace(${JSON.stringify(link(to))}+location.search)</script></head><body><p>Страница переехала: <a href="${link(to)}">${u}</a></p></body></html>`);
+  write(`${from.replace(/^\//, "")}index.html`, `<!doctype html><html lang="ru"><head><meta charset="utf-8"><title>Страница переехала</title><link rel="canonical" href="${u}"><meta name="robots" content="noindex"><link rel="stylesheet" href="${link("/style.css")}"></head><body><main class="wrap" style="padding:40px 16px"><h1>Страница переехала</h1><p>Эта раскраска теперь находится здесь: <a class="btn btn--main" href="${link(to)}">Открыть раскраску</a></p></main></body></html>`);
 }
 for (const p of pages) if (p.old && p.old !== pageUrl(p)) redirect(p.old, pageUrl(p));
 const oldCats = { "novyj-god": "/prazdniki/novyj-god/" };
